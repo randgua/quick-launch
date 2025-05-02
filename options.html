@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quick Launch Options</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 10px;
+      min-width: 300px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"] {
+      width: 95%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+    li span {
+        flex-grow: 1;
+        margin-left: 10px;
+        margin-right: 10px;
+        word-break: break-all;
+    }
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .remove-btn {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 3px;
+    }
+    #status {
+        margin-top: 15px;
+        color: green;
+    }
+  </style>
+</head>
+<body>
+  <h2>Quick Launch Options</h2>
+
+  <h3>Add New Website</h3>
+  <label for="new-url">URL:</label>
+  <input type="text" id="new-url" placeholder="e.g., https://www.google.com">
+  <button id="add-btn">Add Website</button>
+
+  <h3>Website List</h3>
+  <p>Select the default website to launch:</p>
+  <ul id="website-list">
+    <!-- Website list will be populated here -->
+  </ul>
+
+  <div id="status"></div>
+
+  <script src="options.js"></script>
+</body>
+</html> 
