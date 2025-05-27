@@ -66,6 +66,22 @@ function renderList(websites = [], defaultUrl = null) {
         const urlSpan = document.createElement('span');
         urlSpan.textContent = url;
 
+        const upBtn = document.createElement('button');
+        upBtn.textContent = '↑';
+        upBtn.title = 'Move up';
+        upBtn.disabled = index === 0;
+        upBtn.addEventListener('click', () => {
+            moveWebsite(index, -1);
+        });
+
+        const downBtn = document.createElement('button');
+        downBtn.textContent = '↓';
+        downBtn.title = 'Move down';
+        downBtn.disabled = index === websites.length - 1;
+        downBtn.addEventListener('click', () => {
+            moveWebsite(index, 1);
+        });
+
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove';
         removeBtn.classList.add('remove-btn');
@@ -76,6 +92,8 @@ function renderList(websites = [], defaultUrl = null) {
 
         listItem.appendChild(radioBtn);
         listItem.appendChild(urlSpan);
+        listItem.appendChild(upBtn);
+        listItem.appendChild(downBtn);
         listItem.appendChild(removeBtn);
         websiteListElement.appendChild(listItem);
     });
@@ -132,6 +150,20 @@ function setDefaultUrl(url) {
         storeData(websites, url, () => {
             // Re-render to potentially update radio buttons if needed, although direct change handles it.
             // renderList(websites, url); 
+        });
+    });
+}
+
+// 新增：移动网址排序
+function moveWebsite(index, direction) {
+    getStoredData((websites, defaultUrl) => {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= websites.length) return;
+        const newWebsites = [...websites];
+        const [moved] = newWebsites.splice(index, 1);
+        newWebsites.splice(newIndex, 0, moved);
+        storeData(newWebsites, defaultUrl, () => {
+            renderList(newWebsites, defaultUrl);
         });
     });
 }

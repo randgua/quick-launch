@@ -18,9 +18,35 @@
     "service_worker": "background.js"
   },
   "options_page": "options.html",
+  "commands": {
+    "open_site_1": {
+      "suggested_key": {
+        "default": "Ctrl+1"
+      },
+      "description": "Open the first favorite website"
+    },
+    "open_site_2": {
+      "suggested_key": {
+        "default": "Ctrl+2"
+      },
+      "description": "Open the second favorite website"
+    },
+    "open_site_3": {
+      "suggested_key": {
+        "default": "Ctrl+3"
+      },
+      "description": "Open the third favorite website"
+    },
+    "open_site_4": {
+      "suggested_key": {
+        "default": "Ctrl+4"
+      },
+      "description": "Open the fourth favorite website"
+    }
+  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   }
-} 
+}
