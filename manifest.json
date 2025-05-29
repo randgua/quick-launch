@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Quick Launch",
   "version": "1.0",
-  "description": "Opens a specified website when the extension icon is clicked.",
+  "description": "Quickly open pre-selected websites. Manage your list, choose sites for quick launch, and set shortcuts for favorites.",
   "permissions": [
     "storage",
     "tabs"
@@ -19,29 +19,29 @@
   },
   "options_page": "options.html",
   "commands": {
-    "open_site_1": {
+    "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+1"
+        "default": "Ctrl+Z"
       },
-      "description": "Open the first favorite website"
+      "description": "Launch Quick Launch (main action)"
     },
-    "open_site_2": {
+    "open_favorite_site_1": {
       "suggested_key": {
-        "default": "Ctrl+2"
+        "default": "Alt+1"
       },
-      "description": "Open the second favorite website"
+      "description": "Open Favorite Website 1"
     },
-    "open_site_3": {
+    "open_favorite_site_2": {
       "suggested_key": {
-        "default": "Ctrl+3"
+        "default": "Alt+2"
       },
-      "description": "Open the third favorite website"
+      "description": "Open Favorite Website 2"
     },
-    "open_site_4": {
+    "open_favorite_site_3": {
       "suggested_key": {
-        "default": "Ctrl+4"
+        "default": "Alt+3"
       },
-      "description": "Open the fourth favorite website"
+      "description": "Open Favorite Website 3"
     }
   },
   "icons": {

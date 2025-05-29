@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">  <!-- Add this line -->
+  <meta charset="UTF-8">
   <title>Quick Launch Options</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 10px;
-      min-width: 300px;
+      min-width: 350px; 
     }
     label {
       display: block;
@@ -24,17 +24,43 @@
     }
     li {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding: 5px 0;
       border-bottom: 1px solid #eee;
+      cursor: grab; /* Indicate items are draggable on the whole item, if no specific handle is focused */
     }
-    li span {
+    li:active {
+        cursor: grabbing;
+    }
+
+    .drag-handle {
+        padding: 0 8px 0 2px; /* Spacing around the handle */
+        cursor: grab;
+        font-size: 1.2em; /* Make handle icon a bit larger */
+        color: #777;
+    }
+    .drag-handle:active {
+        cursor: grabbing;
+    }
+
+    input[type="checkbox"] {
+        margin-left: 0px; 
+        margin-right: 8px;
+    }
+
+    /* Styling for the clickable URL link */
+    a.url-text { 
         flex-grow: 1;
-        margin-left: 10px;
         margin-right: 10px;
         word-break: break-all;
+        color: #0000EE; /* Standard link color */
+        text-decoration: underline; /* Standard link underline */
+        cursor: pointer; /* Ensure pointer cursor for links */
     }
+    a.url-text:hover {
+        color: #00008B; /* Darker blue on hover */
+    }
+
     button {
       padding: 5px 10px;
       cursor: pointer;
@@ -44,10 +70,19 @@
         color: white;
         border: none;
         border-radius: 3px;
+        margin-left: auto; /* Push remove button to the far right */
     }
     #status {
         margin-top: 15px;
         color: green;
+    }
+    /* Styling for visual feedback during drag and drop */
+    li.dragging-item {
+      opacity: 0.5;
+      background: #f0f0f0;
+    }
+    li.drag-over-item {
+      border-top: 2px dashed blue;
     }
   </style>
 </head>
@@ -60,11 +95,20 @@
   <button id="add-btn">Add Website</button>
 
   <h3>Website List</h3>
-  <p>Select the default website to launch:</p>
-  <p>You can reorder your favorite websites. The order determines which shortcut opens which site.<br>
-  <b>Shortcuts:</b> Ctrl+1/2/3/4/5 to open the 1st/2nd/3rd/4th/5th website in the list (set in Chrome extension keyboard shortcuts settings).</p>
+  <p>Select website(s) for quick launch (icon click, or global shortcut Ctrl+Z, opens all selected websites in new tabs):</p>
+  <p>You can reorder your favorite websites by dragging and dropping them (use the ☰ handle). The order determines which shortcut opens which site.<br>
+  <b>Global Shortcuts:</b> Press Alt+1, Alt+2, or Alt+3 to open the 1st, 2nd, or 3rd website in the list respectively. These shortcuts are global and can be configured in Chrome's extension keyboard shortcuts settings (<code>chrome://extensions/shortcuts</code>). Be aware that Ctrl+[Number] might conflict with default browser tab switching shortcuts.</p>
   <ul id="website-list">
-    <!-- Website list will be populated here -->
+    <!-- 
+      Website list will be populated by options.js.
+      Each list item (li) should be structured by options.js similar to this to make URLs clickable:
+      <li>
+        <span class="drag-handle">☰</span>
+        <input type="checkbox" />
+        <a href="ACTUAL_URL_HERE" target="_blank" class="url-text">DISPLAY_URL_HERE</a>
+        <button class="remove-btn">Remove</button>
+      </li>
+    -->
   </ul>
 
   <div id="status"></div>

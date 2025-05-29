@@ -1,56 +1,99 @@
-// Listen for the extension icon click
-chrome.action.onClicked.addListener((tab) => {
-  // Retrieve the default URL from storage
-  chrome.storage.sync.get(['defaultUrl'], function(result) {
-    const defaultUrl = result.defaultUrl;
+// Default websites if none are set yet
+// const initialWebsites = [
+//   { url: 'https://www.google.com', isQuickLaunch: true },
+//   { url: 'https://www.youtube.com', isQuickLaunch: true },
+//   { url: 'https://www.facebook.com', isQuickLaunch: true },
+//   { url: 'https://www.instagram.com', isQuickLaunch: true },
+//   { url: 'https://www.x.com', isQuickLaunch: true },
+// ];
 
-    if (defaultUrl) {
-      // Open the default URL in a new tab
-      chrome.tabs.create({ url: defaultUrl });
-    } else {
-      // If no default URL is set, open the options page
-      chrome.runtime.openOptionsPage();
-    }
-  });
-});
+// chrome.runtime.onInstalled.addListener(() => {
+//   chrome.storage.sync.get('websites', (data) => {
+//     if (!data.websites || data.websites.length === 0) {
+//       chrome.storage.sync.set({ websites: initialWebsites }, () => {
+//         console.log('Quick Launch: Initialized with default websites.');
+//       });
+//     }
+//   });
+// });
+
+// Listen for the extension icon click
+chrome.action.onClicked.addListener(openSelectedWebsites);
 
 // Listen for keyboard shortcut commands
 chrome.commands.onCommand.addListener((command) => {
-  chrome.storage.sync.get(['websites'], function(result) {
-    const websites = result.websites || [];
-    let index = null;
-    if (command === 'open_site_1') index = 0;
-    else if (command === 'open_site_2') index = 1;
-    else if (command === 'open_site_3') index = 2;
-    else if (command === 'open_site_4') index = 3;
-    else if (command === 'open_site_5') index = 4;
-    
-    if (index !== null && websites[index]) {
-      chrome.tabs.create({ url: websites[index] });
-    } else if (index !== null && !websites[index]) {
-      // If the shortcut is used but the website is not set, open options page
-      chrome.runtime.openOptionsPage();
-    }
-  });
-});
-
-// Set default websites on first install
-chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    const defaultWebsites = [
-      "https://aistudio.google.com",
-      "https://www.notion.so",
-      "https://www.bilibili.com"
-    ];
-    chrome.storage.sync.set({
-      websites: defaultWebsites,
-      defaultUrl: defaultWebsites.length > 0 ? defaultWebsites[0] : null // Set the first website as the default for icon click
-    }, () => {
-      if (chrome.runtime.lastError) {
-        console.error("Error initializing default websites:", chrome.runtime.lastError);
-      } else {
-        console.log("Default websites initialized.");
-      }
-    });
+  console.log(`Command received: ${command}`);
+  if (command === '_execute_action') {
+    openSelectedWebsites();
+  } else if (command === 'open_favorite_site_1') {
+    openFavoriteSite(0); // 0-indexed
+  } else if (command === 'open_favorite_site_2') {
+    openFavoriteSite(1); // 0-indexed
+  } else if (command === 'open_favorite_site_3') {
+    openFavoriteSite(2); // 0-indexed
   }
 });
+
+function openSelectedWebsites() {
+  chrome.storage.sync.get('websites', (data) => {
+    if (chrome.runtime.lastError) {
+      console.error(`Error retrieving websites: ${chrome.runtime.lastError.message}`);
+      return;
+    }
+    let websites = data.websites || [];
+    // If empty, auto-initialize with default websites
+    if (!Array.isArray(websites) || websites.length === 0) {
+      websites = [
+        { id: '1', url: 'https://www.google.com', selected: true },
+        { id: '2', url: 'https://www.youtube.com', selected: true }
+      ];
+      chrome.storage.sync.set({ websites }, () => {
+        // Call again to ensure opening after initialization
+        openSelectedWebsites();
+      });
+      return;
+    }
+    const sitesToOpen = websites.filter(site => site.selected === true && site.url);
+    if (sitesToOpen.length === 0) {
+      console.log('Quick Launch: No websites selected for quick launch.');
+      return;
+    }
+    sitesToOpen.forEach(site => {
+      if (isValidUrl(site.url)) {
+        chrome.tabs.create({ url: site.url });
+      } else {
+        console.warn(`Quick Launch: Invalid URL skipped: ${site.url}`);
+      }
+    });
+  });
+}
+
+function openFavoriteSite(index) {
+  chrome.storage.sync.get('websites', (data) => {
+    if (chrome.runtime.lastError) {
+      console.error(`Error retrieving websites: ${chrome.runtime.lastError.message}`);
+      return;
+    }
+    const websites = data.websites || [];
+    if (websites.length > index && websites[index] && websites[index].url) {
+      if (isValidUrl(websites[index].url)) {
+        chrome.tabs.create({ url: websites[index].url });
+      } else {
+        console.warn(`Quick Launch: Invalid URL for favorite site at index ${index}: ${websites[index].url}`);
+      }
+    } else {
+      console.log(`Quick Launch: No favorite website configured at index ${index}.`);
+      // Optionally, open options page or notify user
+      // chrome.runtime.openOptionsPage();
+    }
+  });
+}
+
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
