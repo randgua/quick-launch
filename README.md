@@ -1,7 +1,9 @@
 # quick-launch
 A simple Chrome extension to quickly open pre-selected default websites by clicking the extension icon or using a keyboard shortcut. Allows managing a list of websites, selecting which ones open with the main action, and assigning shortcuts to your top favorite sites.
 
-<p align="center">![Quick Launch Icon](icons/icon128.png)</p>
+<p align="center">
+  <img src="icons/icon128.png" alt="Quick Launch Icon">
+</p>
 
 ## Features
 
