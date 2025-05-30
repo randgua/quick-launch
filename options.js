@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const websiteListUl = document.getElementById('website-list');
   const statusDiv = document.getElementById('status');
 
-  let websites = []; // Stores the list of website objects
-  let draggedItem = null; // Stores the DOM element being dragged
+  let websites = [];
+  let draggedItem = null;
 
   // Default websites to load if storage is empty
   const PREDEFINED_DEFAULT_WEBSITES = [
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.sync.get({ websites: [] }, (data) => {
       if (chrome.runtime.lastError) {
         console.error("Error loading websites:", chrome.runtime.lastError.message);
-        websites = []; // Initialize with empty array on error
+        websites = [];
         renderWebsiteList();
         return;
       }
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!Array.isArray(websites) || websites.length === 0) {
         // Initialize with predefined defaults if storage is empty or invalid
         websites = PREDEFINED_DEFAULT_WEBSITES.map((site, idx) => ({
-          id: crypto.randomUUID(), // Assign unique ID
+          id: crypto.randomUUID(),
           url: site.url,
           selected: site.selected !== undefined ? site.selected : true
         }));
@@ -93,15 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
    * Clears the current list and rebuilds it based on the 'websites' array.
    */
   function renderWebsiteList() {
-    websiteListUl.innerHTML = ''; // Clear the current list
+    websiteListUl.innerHTML = '';
 
     if (!Array.isArray(websites) || websites.length === 0) {
       const emptyLi = document.createElement('li');
       emptyLi.textContent = 'No websites added yet.';
       emptyLi.style.textAlign = 'center';
       emptyLi.style.width = '100%';
-      emptyLi.style.display = 'block'; // Ensure it takes full width
-      emptyLi.style.cursor = 'default'; // No grab cursor for empty message
+      emptyLi.style.display = 'block';
+      emptyLi.style.cursor = 'default';
       websiteListUl.appendChild(emptyLi);
       return;
     }
@@ -109,12 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
     websites.forEach((website) => {
       if (!website || typeof website.id === 'undefined') {
         console.warn("Website object is invalid or missing ID, skipping:", website);
-        return; // Skip rendering this invalid item
+        return;
       }
 
       const listItem = document.createElement('li');
       listItem.setAttribute('draggable', 'true');
-      listItem.dataset.id = website.id; // Use dataset for ID
+      listItem.dataset.id = website.id;
 
       const dragHandle = document.createElement('span');
       dragHandle.className = 'drag-handle';
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const urlLink = document.createElement('a');
       urlLink.href = website.url;
       urlLink.textContent = website.url;
-      urlLink.target = '_blank'; // Open link in a new tab
+      urlLink.target = '_blank';
       urlLink.className = 'url-text';
       listItem.appendChild(urlLink);
 
@@ -163,8 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Adds a new website to the list. Supports comma or space separated multiple URLs.
+   * Adds new website(s) to the list. Supports comma or space separated multiple URLs.
    * URLs are prefixed with 'https://' if no protocol is provided.
+   * New websites are added to the top of the list, maintaining the order from the input.
+   * e.g., if input is "url1.com, url2.com", url1.com will be at the top, followed by url2.com.
    */
   function addWebsite() {
     let input = newUrlInput.value.trim();
@@ -174,8 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const urlList = input.split(/[,\s]+/).map(url => url.trim()).filter(Boolean);
-    let addedCount = 0;
     let duplicateCount = 0;
+    const newWebsitesBatch = [];
 
     urlList.forEach(url => {
       let fullUrl = url;
@@ -183,30 +185,37 @@ document.addEventListener('DOMContentLoaded', () => {
         fullUrl = 'https://' + fullUrl;
       }
 
-      if (websites.some(site => site.url === fullUrl)) {
+      // Check for duplicates in existing websites array and in the current batch
+      if (websites.some(site => site.url === fullUrl) || newWebsitesBatch.some(site => site.url === fullUrl)) {
         duplicateCount++;
-        return; // Skip if URL already exists
+        return;
       }
 
       const newWebsite = {
-        id: crypto.randomUUID(), // Generate a unique ID
+        id: crypto.randomUUID(),
         url: fullUrl,
-        selected: true, // Default to selected
+        selected: true,
       };
-      websites.push(newWebsite);
-      addedCount++;
+      newWebsitesBatch.push(newWebsite);
     });
 
-    if (addedCount > 0) {
+    if (newWebsitesBatch.length > 0) {
+      websites = [...newWebsitesBatch, ...websites];
       saveWebsites();
       renderWebsiteList();
-      showStatus(`${addedCount} website(s) added successfully!`, 'green');
+      showStatus(`${newWebsitesBatch.length} website(s) added successfully to the top!`, 'green');
     } else if (duplicateCount > 0 && urlList.length === duplicateCount) {
-      showStatus('All entered URLs are already in the list.', 'orange');
+      showStatus('All entered URLs are already in the list or were duplicates within the input.', 'orange');
     } else if (duplicateCount > 0) {
-        showStatus(`${duplicateCount} URL(s) were duplicates and not added. Others processed.`, 'orange');
+        // This case handles partial success: some duplicates, some new ones (if any new ones were added, the above block handles it)
+        // If newWebsitesBatch.length is 0 but duplicateCount > 0 and urlList.length > duplicateCount, it means non-duplicate items were invalid
+        // For simplicity, if newWebsitesBatch is empty but there were duplicates, this message is fine.
+        showStatus(`${duplicateCount} URL(s) were duplicates and not added.`, 'orange');
     }
-    newUrlInput.value = ''; // Clear input field
+    // If newWebsitesBatch.length is 0 and duplicateCount is 0, but urlList was not empty, it means input was invalid (e.g. just spaces after split)
+    // This case is implicitly handled as no message is shown if no websites are added and no duplicates found.
+
+    newUrlInput.value = '';
   }
 
   /**
@@ -243,13 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
     statusDiv.style.color = color;
     setTimeout(() => {
       statusDiv.textContent = '';
-    }, 3000); // Message disappears after 3 seconds
+    }, 3000);
   }
 
   // --- Drag and Drop Handlers ---
   function handleDragStart(e) {
     draggedItem = this; // 'this' refers to the li element being dragged
-    this.classList.add('dragging-item'); // Style for visual feedback
+    this.classList.add('dragging-item');
     e.dataTransfer.effectAllowed = 'move';
     // Use the website's unique ID for data transfer
     e.dataTransfer.setData('text/plain', this.dataset.id);
@@ -258,20 +267,20 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleDragOver(e) {
     e.preventDefault(); // Necessary to allow dropping
     if (this !== draggedItem) { // 'this' is the potential drop target
-        this.classList.add('drag-over-item'); // Style for visual feedback
+        this.classList.add('drag-over-item');
     }
     e.dataTransfer.dropEffect = 'move';
   }
 
   function handleDragLeave(e) {
-    this.classList.remove('drag-over-item'); // Remove hover style
+    this.classList.remove('drag-over-item');
   }
 
   function handleDrop(e) {
     e.stopPropagation(); // Prevent event from bubbling up
     this.classList.remove('drag-over-item');
 
-    if (draggedItem !== this) { // Ensure it's not dropped on itself
+    if (draggedItem !== this) {
       const draggedId = e.dataTransfer.getData('text/plain');
       const targetId = this.dataset.id; // 'this' is the drop target li
 
@@ -284,8 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
         websites.splice(toIndex, 0, reorderedItem);
 
         saveWebsites();
-        renderWebsiteList(); // Re-render the list to reflect the new order
-        showStatus('Websites reordered successfully.', 'green'); // Success message
+        renderWebsiteList();
+        showStatus('Websites reordered successfully.', 'green');
       } else {
         console.warn("Could not find dragged or target item in websites array during drop.");
       }
@@ -298,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.classList.remove('dragging-item');
         item.classList.remove('drag-over-item');
     });
-    draggedItem = null; // Reset dragged item
+    draggedItem = null;
   }
 });
+
