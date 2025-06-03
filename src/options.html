@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Launch Options</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      padding: 10px 20px;
+      margin: 20px auto;
+      max-width: 1000px;
+      min-width: 450px;
+      font-size: 13px;
+    }
+    h2 {
+        color: #333;
+        font-size: 1.6em;
+        margin-bottom: 0.75em;
+    }
+    h3 {
+        color: #333;
+        font-size: 1.4em;
+        margin-bottom: 0.5em;
+    }
+    p {
+        font-size: 1.0em;
+        line-height: 1.5;
+        margin-bottom: 1em;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 1.0em;
+    }
+    input[type="text"], textarea {
+      width: 95%;
+      padding: 6px 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1.0em;
+    }
+    textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+    button {
+      padding: 8px 12px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1.0em;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .open-link-btn, .remove-btn {
+        font-size: 0.95em;
+        color: white;
+        padding: 5px 8px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        box-sizing: border-box;
+        flex: 1;
+        text-align: center;
+        min-width: 0;
+    }
+    .open-link-btn {
+        background-color: #17a2b8;
+    }
+    .open-link-btn:hover {
+        background-color: #138496;
+    }
+    .open-link-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    .remove-btn {
+        background-color: #f44336;
+    }
+    .remove-btn:hover {
+        background-color: #d32f2f;
+    }
+    .website-list-container {
+      margin-top: 20px;
+    }
+
+    /* List Header Styling */
+    .list-header {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 2px solid #ccc;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+        background-color: #f1f1f1;
+        font-size: 0.95em;
+    }
+    .header-drag {
+        width: 45px;
+        flex-shrink: 0;
+        text-align: center;
+        padding: 0 5px; box-sizing: border-box;
+    }
+    .header-select {
+        width: 70px;
+        flex-shrink: 0;
+        text-align: center;
+        padding: 0 5px; box-sizing: border-box;
+    }
+    .header-url {
+        flex-grow: 1;
+        text-align: left;
+        padding: 0 8px; box-sizing: border-box;
+    }
+    .header-actions {
+        width: 140px;
+        flex-shrink: 0;
+        text-align: center;
+        padding: 0 5px; box-sizing: border-box;
+    }
+    .url-edit-hint { /* Hint for URL editing in the header */
+        font-size: 0.85em;
+        color: #555;
+        margin-left: 5px;
+    }
+
+    /* List Item Styling */
+    .list-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .list-item:last-child {
+        border-bottom: none;
+    }
+    .list-item.dragging-item { /* Style for the item being dragged */
+      opacity: 0.5;
+      background: #f0f8ff;
+    }
+    .list-item.drag-over-item { /* Style for item when another is dragged over it */
+      border-top: 2px dashed #007bff;
+    }
+
+    /* Styling for direct children of .list-item to act as cells */
+    .list-item > .drag-handle {
+        flex-basis: 45px;
+        flex-shrink: 0;
+        text-align: center;
+        cursor: grab;
+        font-size: 1.4em;
+        color: #777;
+        user-select: none;
+        padding: 0 5px; box-sizing: border-box;
+    }
+    .list-item > .drag-handle:active {
+        cursor: grabbing;
+    }
+
+    .list-item-select-cell {
+        flex-basis: 70px;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 5px; box-sizing: border-box;
+    }
+    .list-item-select-cell .website-checkbox { /* Checkbox within a list item */
+        margin: 0;
+        cursor: pointer;
+        transform: scale(1.1);
+    }
+
+    .list-item > .website-url-input {
+        flex-grow: 1;
+        flex-basis: 0;
+        min-width: 150px;
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 1.0em;
+        margin: 0 8px;
+    }
+    .list-item > .website-url-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .list-item > .actions-container {
+        flex-basis: 140px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 5px;
+        padding: 0 5px; box-sizing: border-box;
+    }
+
+    #status {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 4px;
+        display: none;
+        font-size: 0.95em;
+    }
+    #status.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    #status.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    #status.info {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+    .bulk-add-container {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f9f9f9;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+    }
+    .bulk-add-container h3 {
+        margin-top: 0;
+    }
+    .hint {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: -5px;
+        margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Quick Launch Options</h2>
+
+  <div class="bulk-add-container">
+    <h3>Bulk Add Websites</h3>
+    <label for="bulk-urls-input">Enter URLs (one per line, or comma/space separated):</label>
+    <textarea id="bulk-urls-input" placeholder="https://www.google.com
+https://www.youtube.com, https://github.com
+file:///C:/Users/yourname/Documents/file.pdf
+chrome-extension://extension_id/page.html"></textarea>
+    <div class="hint">Each URL will be added as a new entry. Invalid or duplicate URLs will be skipped. (Cmd/Ctrl+Enter to submit)</div>
+    <button id="bulk-add-btn">Add Websites from List</button>
+  </div>
+
+  <h3>Website List</h3>
+  <div class="website-list-container">
+    <div class="list-header">
+      <div class="header-drag">Drag</div>
+      <div class="header-select">Select</div>
+      <div class="header-url">URL (Editable) <span class="url-edit-hint">(Cmd/Ctrl+Enter to Save)</span></div>
+      <div class="header-actions">Actions</div>
+    </div>
+    <div id="website-list">
+      <!-- Website list items will be dynamically inserted here by JavaScript -->
+    </div>
+  </div>
+
+  <div id="status" aria-live="polite"></div>
+
+  <script src="options.js"></script>
+
+  <p>Select website(s) for quick launch (icon click, or the main global shortcut, opens all selected websites in new tabs). You can set or change the main global shortcut in Chrome's extension keyboard shortcuts settings (<code>chrome://extensions/shortcuts</code>).</p>
+  <p>You can reorder your favorite websites by dragging and dropping them (use the ☰ handle). The order determines which shortcut opens which site.<br>
+  <b>Global Shortcuts:</b> Press Alt+1, Alt+2, or Alt+3 to open the 1st, 2nd, or 3rd website in the list respectively. These shortcuts are global and can be configured in Chrome's extension keyboard shortcuts settings (<code>chrome://extensions/shortcuts</code>). Be aware that Ctrl+[Number] might conflict with default browser tab switching shortcuts.</p>
+  <p style="font-style: italic; color: #555; background-color: #f0f8ff; padding: 8px; border-radius: 4px; border: 1px solid #cce5ff;">
+    <b>Note for <code>file:///</code> URLs:</b> To add and open local files (e.g., <code>file:///C:/path/to/your/file.pdf</code> or <code>file:///Users/yourname/path/to/file.pdf</code>), you must enable the "Allow access to file URLs" option for this extension. You can find this setting by navigating to <code>chrome://extensions</code>, finding "Quick Launch", clicking "Details", and toggling the switch for "Allow access to file URLs".
+  </p>
+</body>
+</html>

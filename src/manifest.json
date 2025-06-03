@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Quick Launch",
+  "version": "1.0.0",
+  "description": "Quickly open pre-selected websites. Manage your list, choose sites for quick launch, and set shortcuts for favorites.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    },
+    "default_title": "Quick Launch"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options.html",
+  "commands": {
+    "_execute_action": {
+      "description": "Launch Quick Launch (main action)"
+    },
+    "open_favorite_site_1": {
+      "suggested_key": {
+        "default": "Alt+1"
+      },
+      "description": "Open Favorite Website 1"
+    },
+    "open_favorite_site_2": {
+      "suggested_key": {
+        "default": "Alt+2"
+      },
+      "description": "Open Favorite Website 2"
+    },
+    "open_favorite_site_3": {
+      "suggested_key": {
+        "default": "Alt+3"
+      },
+      "description": "Open Favorite Website 3"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
