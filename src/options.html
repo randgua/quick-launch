@@ -228,6 +228,7 @@
         border: 1px solid #ffeeba;
     }
     .bulk-add-container {
+        margin-top: 30px; 
         margin-bottom: 20px;
         padding: 15px;
         background: #f9f9f9;
@@ -248,17 +249,6 @@
 <body>
   <h2>Quick Launch Options</h2>
 
-  <div class="bulk-add-container">
-    <h3>Bulk Add Websites</h3>
-    <label for="bulk-urls-input">Enter URLs (one per line, or comma/space separated):</label>
-    <textarea id="bulk-urls-input" placeholder="https://www.google.com
-https://www.youtube.com, https://github.com
-file:///C:/Users/yourname/Documents/file.pdf
-chrome-extension://extension_id/page.html"></textarea>
-    <div class="hint">Each URL will be added as a new entry. Invalid or duplicate URLs will be skipped. (Cmd/Ctrl+Enter to submit)</div>
-    <button id="bulk-add-btn">Add Websites from List</button>
-  </div>
-
   <h3>Website List</h3>
   <div class="website-list-container">
     <div class="list-header">
@@ -270,6 +260,17 @@ chrome-extension://extension_id/page.html"></textarea>
     <div id="website-list">
       <!-- Website list items will be dynamically inserted here by JavaScript -->
     </div>
+  </div>
+
+  <div class="bulk-add-container">
+    <h3>Bulk Add Websites</h3>
+    <label for="bulk-urls-input">Enter URLs (one per line, or comma/space separated):</label>
+    <textarea id="bulk-urls-input" placeholder="https://www.google.com
+https://www.youtube.com, https://github.com
+file:///C:/Users/yourname/Documents/file.pdf
+chrome-extension://extension_id/page.html"></textarea>
+    <div class="hint">Each URL will be added as a new entry. Invalid or duplicate URLs will be skipped. (Cmd/Ctrl+Enter to submit)</div>
+    <button id="bulk-add-btn">Add Websites from List</button>
   </div>
 
   <div id="status" aria-live="polite"></div>
