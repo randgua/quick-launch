@@ -1,0 +1,37 @@
+name: Create Release for Quick Launch
+
+# This workflow runs automatically on a push to a tag starting with 'v'.
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    # Grant write permissions to the job to allow it to create a release.
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Package extension
+        run: |
+          cd src
+          zip -r ../quick-launch-${{ github.ref_name }}.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # The name of the release, e.g., "Release v1.3.0".
+          name: "Release ${{ github.ref_name }}"
+          # Automatically generate release notes from commit messages.
+          generate_release_notes: true
+          # Attach the packaged .zip file to the release.
+          files: quick-launch-${{ github.ref_name }}.zip
+        env:
+          # The GITHUB_TOKEN is a secret automatically provided by GitHub Actions.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
